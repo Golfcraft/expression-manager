@@ -1,0 +1,22 @@
+{
+    "compilerOptions": {      
+        "outDir": "out",
+        "module": "commonjs",
+        "lib": ["es6", "DOM", "es2017"],
+        "noLib": false,
+        "allowJs": true,
+        "target": "es2016",
+        "declaration": true,
+        "noImplicitAny": false,
+        "experimentalDecorators": true,
+        "sourceMap": true,
+        "esModuleInterop": true,
+        "moduleResolution": "node"
+    },
+    "transpileOnly":true,
+    "include": [
+      "./**/*.test.ts",
+      "expression-storage.d.ts",
+      "node_modules/mana-fever-utils"
+    ]
+}
