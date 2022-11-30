@@ -1,7 +1,6 @@
 import { createState } from "./state";
 import Jsep from "jsep";
 import { evaluate } from "./jsep-eval";
-import seedrandom = require('seedrandom');
 
 export type RuntimeAssignmentParams = {
     storage,
@@ -14,14 +13,10 @@ export enum EVENT {
     EVENT_VARIABLE_CHANGE
 }
 
-const createExpressionStorage = ( initialState: any, initialAssignments?:any)=>{
+const createExpressionManager = ( initialState: any, {initialAssignments = null, context}:any = {})=>{
     const defaultContext = {
-        getRandomInt:(min,max, noSeed)=>getRandomInt(min, max, noSeed),
-        now:()=>Date.now(),
-        initialized:false
+        ...context
     };
-    let seedRandom = seedrandom(initialState.seed, {});
-
 
     const store = createState(initialState);
     const callbacks = {
@@ -99,16 +94,6 @@ const createExpressionStorage = ( initialState: any, initialAssignments?:any)=>{
         store.setState(initializationState);
     }
 
-    function getRandomInt(min, max, avoidDefaultSeedOrSeed?){
-        if(avoidDefaultSeedOrSeed !== undefined && avoidDefaultSeedOrSeed !== true){
-            return min + Math.floor(seedrandom(avoidDefaultSeedOrSeed, {})() * (max - min + 1));
-        }
-        const result = avoidDefaultSeedOrSeed
-            ? min + Math.floor(Math.random() * (max - min + 1))
-            :min + Math.floor(seedRandom() * (max - min + 1));
-        return result;
-    }
-
     function getControlsAffectedByAssignmentTo(changedVariableName){//TODO optimize?
         const changedStorages = Object.keys(assignmentDependencies[changedVariableName]||{});
 
@@ -131,7 +116,7 @@ const createExpressionStorage = ( initialState: any, initialAssignments?:any)=>{
 
 
     return {
-        addControl: (({id, runtime, defaultValue})=>{
+        addControl: (({id, runtime, defaultValue}:{id:any, runtime:any, defaultValue?:any})=>{
             const storage = runtime.storage;
             const expressionsToListen:string[] = Object.values(runtime).filter(i=>i) as string[];
             const variableNames = expressionsToListen.map(e=> getVariablesFromNode([], Jsep(e))).flat();
@@ -169,11 +154,11 @@ const createExpressionStorage = ( initialState: any, initialAssignments?:any)=>{
         getState: () => store.getState(),
         onEvent: (fn) => {
             callbacks.onEvent.push(fn);
-            return ()=>callbacks.onEvent.splice( callbacks.onEvent.indexOf(fn) ,1);
+            return () => callbacks.onEvent.splice( callbacks.onEvent.indexOf(fn) ,1);
         },
         dispose: () => {
-
-        }
+            //TODO
+        },
     };
 
     function evaluateExpression(expression, context = store.getState()){
@@ -182,16 +167,10 @@ const createExpressionStorage = ( initialState: any, initialAssignments?:any)=>{
     }
 }
 
-const evaluateExpression = evaluate;
-
 export {
-    createExpressionStorage,
-    evaluateExpression
+    createExpressionManager
 };
-export function getVariablesFromExpression(expression){
 
-    return getVariablesFromNode([], Jsep(expression));
-}
 function getVariablesFromNode(acc, node){
     if(node.type === "Identifier"){
         return [...acc, node.name];

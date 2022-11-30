@@ -20,8 +20,6 @@ export declare enum EVENT {
     EVENT_VARIABLE_CHANGE = 0
 }
 
-export declare function getVariablesFromExpression(expression: any): any;
-
 export declare type RuntimeAssignmentParams = {
     storage: any;
     expression: any;

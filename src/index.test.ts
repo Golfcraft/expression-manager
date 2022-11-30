@@ -32,7 +32,7 @@ describe("ExpressionStorage", () => {
     describe("addControl", ()=>{
         describe("with read property", ()=>{
 
-            it("should trigger an event with the control listed on it when value is changed", ()=>{                
+            it("should trigger an event with the control listed on it when value is changed", ()=>{
                 const control = eStorage.addControl({
                     id:0,
                     runtime:{read:"a"}
@@ -50,6 +50,7 @@ describe("ExpressionStorage", () => {
 
                 expect(eventType).to.equal(EVENT.EVENT_VARIABLE_CHANGE);
                 expect(eventData).to.deep.equal({
+                    isDelayed:false,
                     targetControlIds:[control.id],
                     newValues:{
                         a:2
@@ -87,6 +88,7 @@ describe("ExpressionStorage", () => {
             eStorage.setState({a:2});
            
             expect(eventData).to.deep.equal({
+                isDelayed:false,
                 targetControlIds:[control.id, control2.id],
                 newValues:{
                     a:2
@@ -127,7 +129,8 @@ describe("ExpressionStorage", () => {
             expect(controlRead.evaluate("read")).to.eq(4);
             expect(controlWrite.evaluate()).to.eq(2);
             expect(eventType).to.equal(EVENT.EVENT_VARIABLE_CHANGE);
-            expect(eventData).to.deep.equal({            
+            expect(eventData).to.deep.equal({
+                isDelayed:false,
                 targetControlIds:[controlRead.id, controlWrite.id],
                 newValues:{
                     a:2
@@ -198,7 +201,8 @@ describe("ExpressionStorage", () => {
             });
             button2.setValue(true);
             expect(eventType).to.equal(EVENT.EVENT_VARIABLE_CHANGE);
-            expect(eventData).to.deep.equal({            
+            expect(eventData).to.deep.equal({
+                isDelayed:false,
                 targetControlIds:[button2.id],
                 newValues:{
                     button2:true
@@ -250,6 +254,7 @@ describe("ExpressionStorage", () => {
             expect(lastEvent).to.deep.equal({
                 type:EVENT.EVENT_VARIABLE_CHANGE,
                 data:{
+                    isDelayed:false,
                     targetControlIds:[door.id, button2.id],
                     newValues:{
                         button2:true
@@ -309,24 +314,9 @@ describe("ExpressionStorage", () => {
     });
 
     describe("default context functions", ()=>{
-        describe("getRandomInt(min,max)", ()=>{
-            it("should evaluate a random seed and give different result on sequential calls", ()=>{
-                const rt = createExpressionManager({seed:0.1});
-
-                const control = rt.addControl({
-                    id:1,
-                    runtime:{
-                        read:"getRandomInt(0,10)"
-                    },defaultValue:undefined
-                });
-                expect(control.evaluate("read")).to.equal(10);
-                expect(control.evaluate("read")).to.equal(4);
-            })
-        });
-
         describe("now()", ()=>{
            it("should return current datetime", ()=>{
-               const rt = createExpressionManager({});
+               const rt = createExpressionManager({}, {context:{now:()=>Date.now()}});
                const control = rt.addControl({
                    id:1,
                    runtime:{
