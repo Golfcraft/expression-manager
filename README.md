@@ -25,7 +25,7 @@ log('state after interacting with control1', em.getState()) //returns {a: 3, b: 
 log("control2 value", control2.evaluate("anyExpressionToRead")); // logs: 13
 ```
 ####  (For more examples look src/index.test.ts, or see use case at Golfcraft map editor: https://www.youtube.com/watch?v=dSRqDn2JXxM&list=PLsGY7yOl-15QdZyFQZGET5Qc3rBBpHAyg&index=2)
-Note that there is still missing options to document, we will be adding more documentation for runtime assignments like `timeout`, `condition`, `listen`, which are not explained in the example or tests for now, we need to eat and this doesn't give us food, but we will be improving docs over time.
+Note that there is still missing options to document, we will be adding more documentation for runtime assignments like `timeout`, `condition`, `listen`, which are not explained in the example or tests for now. We are using this util internally but we don't have some much time to work on this project, any contribution is welcome.
 
 ## License
 
